@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Home - RentEase</title>
+    <style>
+        /* Home Page Specific Styles */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+            padding: 6rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(13, 110, 253, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+            z-index: -1;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #495057;
+            margin-bottom: 2rem;
+            max-width: 80%;
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            padding: 2rem 1rem;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+        }
+
+        .house-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .house-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .house-card .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .house-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .house-location {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .house-features {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .feature-item {
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .house-price {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0d6efd;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            border-radius: 15px;
+            padding: 3rem;
+            margin: 3rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                max-width: 100%;
+            }
+
+            .cta-section {
+                padding: 2rem 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="hero-title">Find Your Perfect Rental Home</h1>
+                    <p class="hero-subtitle">Discover thousands of verified rental properties in your area. Safe, secure, and simple.</p>
+
+                    <!-- Quick Search -->
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <form th:action="@{/search}" method="get" class="d-flex shadow-sm">
+                                <input type="text" name="keyword" class="form-control form-control-lg border-0"
+                                       placeholder="Enter city, neighborhood, or address..." style="border-radius: 10px 0 0 10px;">
+                                <button type="submit" class="btn btn-warning btn-lg border-0" style="border-radius: 0 10px 10px 0;">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="row mt-4">
+                        <div class="col-4">
+                            <div class="text-center">
+                                <div class="h4 mb-1"><i class="fas fa-home me-2 text-primary"></i>10,000+</div>
+                                <small class="text-muted">Properties</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <div class="h4 mb-1"><i class="fas fa-star me-2 text-warning"></i>4.8/5</div>
+                                <small class="text-muted">Rating</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <div class="h4 mb-1"><i class="fas fa-shield-alt me-2 text-success"></i>100%</div>
+                                <small class="text-muted">Verified</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                         alt="Beautiful House" class="img-fluid rounded shadow" style="max-height: 400px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose RentEase Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Why Choose RentEase?</h2>
+                <p class="lead text-muted">We make finding and renting your next home simple, secure, and stress-free.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card text-center shadow-sm">
+                        <div class="feature-icon text-primary">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h4>Easy Search</h4>
+                        <p class="text-muted">Advanced filters help you find exactly what you're looking for in minutes.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card text-center shadow-sm">
+                        <div class="feature-icon text-success">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>Verified Properties</h4>
+                        <p class="text-muted">All properties are verified and inspected for your safety and peace of mind.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card text-center shadow-sm">
+                        <div class="feature-icon text-warning">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h4>Secure Booking</h4>
+                        <p class="text-muted">Safe and secure booking process with transparent pricing and terms.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Properties -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="display-6 fw-bold">Featured Properties</h2>
+                <a th:href="@{/houses}" class="btn btn-outline-primary">View All Properties</a>
+            </div>
+
+            <div class="row g-4" th:if="${houses != null and !houses.empty}">
+                <div class="col-lg-4 col-md-6" th:each="house : ${houses.content}">
+                    <div class="card house-card h-100">
+                        <img th:src="${house.images != null and !house.images.empty ? house.images[0] : 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'}"
+                             class="card-img-top" th:alt="${house.title}">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" th:text="${house.title}">House Title</h5>
+                            <p class="house-location mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                <span th:text="${house.city + ', ' + house.state}">Location</span>
+                            </p>
+                            <div class="house-features mb-3">
+                                    <span class="feature-item" th:if="${house.bedrooms != null}">
+                                        <i class="fas fa-bed"></i>
+                                        <span th:text="${house.bedrooms}">2</span> Beds
+                                    </span>
+                                <span class="feature-item" th:if="${house.bathrooms != null}">
+                                        <i class="fas fa-bath"></i>
+                                        <span th:text="${house.bathrooms}">1</span> Baths
+                                    </span>
+                                <span class="feature-item" th:if="${house.squareFeet != null}">
+                                        <i class="fas fa-ruler-combined"></i>
+                                        <span th:text="${house.squareFeet}">1200</span> sq ft
+                                    </span>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="house-price" th:text="'$' + ${house.pricePerMonth} + '/month'">$2,500/month</div>
+                                    <a th:href="@{/houses/{id}(id=${house.id})}" class="btn btn-primary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${houses == null or houses.empty}" class="text-center py-5">
+                <i class="fas fa-home fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No properties available at the moment</h4>
+                <p class="text-muted">Check back later for new listings!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="display-6 fw-bold mb-3">Ready to Find Your Dream Home?</h2>
+                    <p class="lead text-muted">Join thousands of satisfied tenants who found their perfect rental through RentEase.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a th:href="@{/search}" class="btn btn-primary btn-lg me-3">Start Searching</a>
+                    <a th:href="@{/register}" class="btn btn-outline-primary btn-lg">Sign Up Free</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div layout:fragment="scripts">
+    <script>
+        // Home Page JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate elements on scroll
+            const animateOnScroll = () => {
+                const elements = document.querySelectorAll('.feature-card, .house-card, .hero-title, .hero-subtitle');
+
+                elements.forEach((element, index) => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.2;
+
+                    if(elementPosition < screenPosition) {
+                        setTimeout(() => {
+                            element.style.opacity = '1';
+                            element.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            };
+
+            // Set initial state for animated elements
+            const animatedElements = document.querySelectorAll('.feature-card, .house-card');
+            animatedElements.forEach(element => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'all 0.5s ease-out';
+            });
+
+            // Hero text animation
+            const heroTitle = document.querySelector('.hero-title');
+            const heroSubtitle = document.querySelector('.hero-subtitle');
+            if (heroTitle && heroSubtitle) {
+                heroTitle.style.opacity = '0';
+                heroTitle.style.transform = 'translateY(20px)';
+                heroTitle.style.transition = 'all 0.8s ease-out';
+
+                heroSubtitle.style.opacity = '0';
+                heroSubtitle.style.transform = 'translateY(20px)';
+                heroSubtitle.style.transition = 'all 0.8s ease-out 0.2s';
+
+                setTimeout(() => {
+                    heroTitle.style.opacity = '1';
+                    heroTitle.style.transform = 'translateY(0)';
+
+                    heroSubtitle.style.opacity = '1';
+                    heroSubtitle.style.transform = 'translateY(0)';
+                }, 100);
+            }
+
+            // Run on load and scroll
+            animateOnScroll();
+            window.addEventListener('scroll', animateOnScroll);
+
+            // Property card hover effect enhancement
+            const propertyCards = document.querySelectorAll('.house-card');
+            propertyCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const img = card.querySelector('.card-img-top');
+                    if (img) {
+                        img.style.transform = 'scale(1.05)';
+                    }
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    const img = card.querySelector('.card-img-top');
+                    if (img) {
+                        img.style.transform = 'scale(1)';
+                    }
+                });
+            });
+
+            // Search form animation
+            const searchForm = document.querySelector('form[th\\:action="@{/search}"]');
+            if (searchForm) {
+                searchForm.style.opacity = '0';
+                searchForm.style.transform = 'translateY(20px)';
+                searchForm.style.transition = 'all 0.8s ease-out 0.4s';
+
+                setTimeout(() => {
+                    searchForm.style.opacity = '1';
+                    searchForm.style.transform = 'translateY(0)';
+                }, 400);
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

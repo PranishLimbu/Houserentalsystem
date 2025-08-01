@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>Add Property - RentEase</title>
+  <style>
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .image-preview-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .image-preview {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #eee;
+    }
+
+    .amenities-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .amenity-tag {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+    }
+
+    .remove-amenity {
+        margin-left: 5px;
+        cursor: pointer;
+        color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="form-section">
+          <div class="form-header">
+            <h2>Add New Property</h2>
+            <p class="text-muted">Fill in the details of your property</p>
+          </div>
+
+          <form th:action="@{/my-houses/add}" method="post" th:object="${house}" enctype="multipart/form-data">
+            <!-- Basic Information -->
+            <div class="mb-4">
+              <h5 class="mb-3">Basic Information</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="title" class="form-label">Property Title</label>
+                  <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                    Please provide a title.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="propertyType" class="form-label">Property Type</label>
+                  <select class="form-select" id="propertyType" th:field="*{propertyType}" required>
+                    <option value="">Select property type</option>
+                    <option th:each="type : ${propertyTypes}"
+                            th:value="${type}"
+                            th:text="${#strings.capitalize(#strings.toLowerCase(type))}">
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('propertyType')}" th:errors="*{propertyType}">
+                    Please select a property type.
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label for="description" class="form-label">Description</label>
+                  <textarea class="form-control" id="description" th:field="*{description}" rows="4" required></textarea>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                    Please provide a description.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="mb-4">
+              <h5 class="mb-3">Location</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="address" class="form-label">Address</label>
+                  <input type="text" class="form-control" id="address" th:field="*{address}" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">
+                    Please provide an address.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="city" class="form-label">City</label>
+                  <input type="text" class="form-control" id="city" th:field="*{city}" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('city')}" th:errors="*{city}">
+                    Please provide a city.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="state" class="form-label">State</label>
+                  <input type="text" class="form-control" id="state" th:field="*{state}" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('state')}" th:errors="*{state}">
+                    Please provide a state.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="zipCode" class="form-label">ZIP Code</label>
+                  <input type="text" class="form-control" id="zipCode" th:field="*{zipCode}" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('zipCode')}" th:errors="*{zipCode}">
+                    Please provide a ZIP code.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="country" class="form-label">Country</label>
+                  <input type="text" class="form-control" id="country" th:field="*{country}" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="mb-4">
+              <h5 class="mb-3">Pricing</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="pricePerMonth" class="form-label">Monthly Rent (Rs)</label>
+                  <input type="number" class="form-control" id="pricePerMonth" th:field="*{pricePerMonth}" min="0" step="0.01" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('pricePerMonth')}" th:errors="*{pricePerMonth}">
+                    Please provide a valid price.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="securityDeposit" class="form-label">Security Deposit (Rs)</label>
+                  <input type="number" class="form-control" id="securityDeposit" th:field="*{securityDeposit}" min="0" step="0.01" required>
+                  <div class="invalid-feedback" th:if="${#fields.hasErrors('securityDeposit')}" th:errors="*{securityDeposit}">
+                    Please provide a valid deposit amount.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Details -->
+            <div class="mb-4">
+              <h5 class="mb-3">Property Details</h5>
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label for="bedrooms" class="form-label">Bedrooms</label>
+                  <input type="number" class="form-control" id="bedrooms" th:field="*{bedrooms}" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label for="bathrooms" class="form-label">Bathrooms</label>
+                  <input type="number" class="form-control" id="bathrooms" th:field="*{bathrooms}" min="0">
+                </div>
+                <div class="col-md-3">
+                  <label for="squareFeet" class="form-label">Square Feet</label>
+                  <input type="number" class="form-control" id="squareFeet" th:field="*{squareFeet}" min="1">
+                </div>
+                <div class="col-md-3">
+                  <label for="floor" class="form-label">Floor</label>
+                  <input type="number" class="form-control" id="floor" th:field="*{floor}" min="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Amenities -->
+            <div class="mb-4">
+              <h5 class="mb-3">Amenities</h5>
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="amenityInput" placeholder="Add amenity">
+                    <button class="btn btn-outline-secondary" type="button" id="addAmenityBtn">Add</button>
+                  </div>
+                  <div class="amenities-container" id="amenitiesContainer">
+                    <!-- Amenity tags will be added here -->
+                  </div>
+                  <input type="hidden" id="amenities" name="amenities" th:value="${house.amenities != null ? #strings.join(house.amenities, ',') : ''}">
+                </div>
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div class="mb-4">
+              <h5 class="mb-3">Features</h5>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="petsAllowed" th:field="*{petsAllowed}">
+                    <label class="form-check-label" for="petsAllowed">Pets Allowed</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="smokingAllowed" th:field="*{smokingAllowed}">
+                    <label class="form-check-label" for="smokingAllowed">Smoking Allowed</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="furnished" th:field="*{furnished}">
+                    <label class="form-check-label" for="furnished">Furnished</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="parkingAvailable" th:field="*{parkingAvailable}">
+                    <label class="form-check-label" for="parkingAvailable">Parking Available</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="laundryAvailable" th:field="*{laundryAvailable}">
+                    <label class="form-check-label" for="laundryAvailable">Laundry Available</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="airConditioning" th:field="*{airConditioning}">
+                    <label class="form-check-label" for="airConditioning">Air Conditioning</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="heating" th:field="*{heating}">
+                    <label class="form-check-label" for="heating">Heating</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="internet" th:field="*{internet}">
+                    <label class="form-check-label" for="internet">Internet</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Images -->
+            <div class="mb-4">
+              <h5 class="mb-3">Images</h5>
+              <div class="mb-3">
+                <label for="images" class="form-label">Upload Property Images</label>
+                <input class="form-control" type="file" id="images" name="images" multiple accept="image/*">
+              </div>
+              <div class="image-preview-container" id="imagePreviewContainer">
+                <!-- Image previews will be added here -->
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="mb-4">
+              <h5 class="mb-3">Availability</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="availabilityStatus" class="form-label">Availability Status</label>
+                  <select class="form-select" id="availabilityStatus" th:field="*{availabilityStatus}" required>
+                    <option th:each="status : ${availabilityStatuses}"
+                            th:value="${status}"
+                            th:text="${#strings.capitalize(#strings.toLowerCase(status))}">
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+              <a th:href="@{/my-houses}" class="btn btn-secondary me-md-2">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Property</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div layout:fragment="scripts">
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Amenities management
+        const amenityInput = document.getElementById('amenityInput');
+        const addAmenityBtn = document.getElementById('addAmenityBtn');
+        const amenitiesContainer = document.getElementById('amenitiesContainer');
+        const amenitiesHiddenInput = document.getElementById('amenities');
+        let amenities = amenitiesHiddenInput.value ? amenitiesHiddenInput.value.split(',') : [];
+
+        // Initialize amenities display
+        function updateAmenitiesDisplay() {
+            amenitiesContainer.innerHTML = '';
+            amenities.forEach((amenity, index) => {
+                if (amenity.trim()) {
+                    const tag = document.createElement('div');
+                    tag.className = 'amenity-tag';
+                    tag.innerHTML = `
+                        ${amenity}
+                        <span class="remove-amenity" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    amenitiesContainer.appendChild(tag);
+                }
+            });
+            amenitiesHiddenInput.value = amenities.join(',');
+        }
+
+        // Add new amenity
+        addAmenityBtn.addEventListener('click', function() {
+            const amenity = amenityInput.value.trim();
+            if (amenity && !amenities.includes(amenity)) {
+                amenities.push(amenity);
+                amenityInput.value = '';
+                updateAmenitiesDisplay();
+            }
+        });
+
+        // Remove amenity
+        amenitiesContainer.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-amenity')) {
+                const index = e.target.closest('.remove-amenity').dataset.index;
+                amenities.splice(index, 1);
+                updateAmenitiesDisplay();
+            }
+        });
+
+        // Image preview
+        const imageInput = document.getElementById('images');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+        imageInput.addEventListener('change', function() {
+            imagePreviewContainer.innerHTML = '';
+            if (this.files) {
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'image-preview';
+                        imagePreviewContainer.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        // Form validation
+        (function() {
+            'use strict';
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms)
+                .forEach(function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+    });
+  </script>
+</div>
+</body>
+</html>

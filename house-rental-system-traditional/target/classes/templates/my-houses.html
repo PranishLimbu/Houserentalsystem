@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+  <title>My Properties - RentEase</title>
+  <style>
+    .property-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .property-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .property-card .card-img-top {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .property-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .property-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .property-features {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .feature-item {
+        background: #f8f9fa;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .property-price {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #0d6efd;
+    }
+
+    @media (max-width: 768px) {
+        .property-card .card-img-top {
+            height: 150px;
+        }
+    }
+  </style>
+</head>
+<body>
+<div layout:fragment="content">
+  <div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="mb-0">My Properties</h1>
+      <a th:href="@{/my-houses/add}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add New Property
+      </a>
+    </div>
+
+    <!-- Properties Grid -->
+    <div th:if="${houses != null and !houses.empty}" class="row g-4">
+      <div class="col-lg-4 col-md-6" th:each="house : ${houses}">
+        <div class="card property-card h-100">
+          <img th:src="${house.images != null and !house.images.empty ? house.images[0] : 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'}"
+               class="card-img-top" th:alt="${house.title}">
+          <span class="badge property-status"
+                th:classappend="${house.availabilityStatus == T(com.houserental.entity.House.AvailabilityStatus).AVAILABLE} ? 'bg-success' : 'bg-secondary'"
+                th:text="${house.availabilityStatus}">
+                        Status
+                    </span>
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title" th:text="${house.title}">Property Title</h5>
+            <p class="text-muted mb-2">
+              <i class="fas fa-map-marker-alt me-1"></i>
+              <span th:text="${house.city + ', ' + house.state}">Location</span>
+            </p>
+            <div class="property-features mb-3">
+                            <span class="feature-item" th:if="${house.bedrooms != null}">
+                                <i class="fas fa-bed"></i>
+                                <span th:text="${house.bedrooms}">2</span> Beds
+                            </span>
+              <span class="feature-item" th:if="${house.bathrooms != null}">
+                                <i class="fas fa-bath"></i>
+                                <span th:text="${house.bathrooms}">1</span> Baths
+                            </span>
+              <span class="feature-item" th:if="${house.squareFeet != null}">
+                                <i class="fas fa-ruler-combined"></i>
+                                <span th:text="${house.squareFeet}">1200</span> sq ft
+                            </span>
+            </div>
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="property-price" th:text="'Rs' + ${house.pricePerMonth} + '/month'">Rs2,500/month</div>
+                <div class="btn-group">
+                  <a th:href="@{/houses/{id}(id=${house.id})}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a th:href="@{/my-houses/edit/{id}(id=${house.id})}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger"
+                          data-bs-toggle="modal"
+                          th:attr="data-bs-target='#deleteModal' + ${house.id}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" th:id="'deleteModal' + ${house.id}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p>Are you sure you want to delete this property?</p>
+                <p class="fw-bold" th:text="${house.title}"></p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form th:action="@{/my-houses/delete/{id}(id=${house.id})}" method="post">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${houses == null or houses.empty}" class="text-center py-5">
+      <i class="fas fa-home fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">You haven't listed any properties yet</h4>
+      <p class="text-muted">Get started by adding your first property</p>
+      <a th:href="@{/my-houses/add}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add Property
+      </a>
+    </div>
+  </div>
+</div>
+
+<div layout:fragment="scripts">
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate cards on scroll
+        const cards = document.querySelectorAll('.property-card');
+
+        const animateOnScroll = () => {
+            cards.forEach((card, index) => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.2;
+
+                if(cardPosition < screenPosition) {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        };
+
+        // Set initial state
+        cards.forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease-out';
+        });
+
+        // Run on load and scroll
+        animateOnScroll();
+        window.addEventListener('scroll', animateOnScroll);
+    });
+  </script>
+</div>
+</body>
+</html>

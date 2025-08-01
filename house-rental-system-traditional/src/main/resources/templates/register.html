@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Register - RentEase</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #3f37c9;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .register-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .register-header {
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .register-header h2 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .register-form {
+            background: white;
+            padding: 2.5rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-right: none;
+            border-radius: 10px 0 0 10px !important;
+        }
+
+        .btn-register {
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .password-strength {
+            height: 5px;
+            border-radius: 5px;
+            margin-top: 5px;
+            transition: all 0.3s;
+        }
+
+        .strength-0 {
+            width: 20%;
+            background-color: #dc3545;
+        }
+
+        .strength-1 {
+            width: 40%;
+            background-color: #fd7e14;
+        }
+
+        .strength-2 {
+            width: 60%;
+            background-color: #ffc107;
+        }
+
+        .strength-3 {
+            width: 80%;
+            background-color: #20c997;
+        }
+
+        .strength-4 {
+            width: 100%;
+            background-color: #198754;
+        }
+
+        .account-type-select {
+            border-radius: 10px !important;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .account-type-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
+        .terms-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms-link:hover {
+            text-decoration: underline;
+        }
+
+        .login-link {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .register-container {
+                margin: 1rem;
+                border-radius: 15px;
+            }
+
+            .register-form {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container py-5">
+        <div class="register-container">
+            <!-- Header Section -->
+            <div class="register-header">
+                <h2>Create Your Account</h2>
+                <p>Join RentEase and find your perfect home</p>
+            </div>
+
+            <!-- Form Section -->
+            <div class="register-form">
+                <!-- Error Message -->
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <form th:action="@{/register}" method="post" th:object="${user}" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <!-- First Name -->
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                       placeholder="Enter first name" required>
+                            </div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">
+                                First name is required.
+                            </div>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                                       placeholder="Enter last name" required>
+                            </div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">
+                                Last name is required.
+                            </div>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="col-12">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-at"></i>
+                                    </span>
+                                <input type="text" class="form-control" id="username" th:field="*{username}"
+                                       placeholder="Choose a username" required minlength="3">
+                            </div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
+                                Username must be at least 3 characters.
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-12">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                <input type="email" class="form-control" id="email" th:field="*{email}"
+                                       placeholder="Enter email address" required>
+                            </div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="col-12">
+                            <label for="phoneNumber" class="form-label">Phone Number (Optional)</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-phone"></i>
+                                    </span>
+                                <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}"
+                                       placeholder="Enter phone number">
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-12">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                <input type="password" class="form-control" id="password" th:field="*{password}"
+                                       placeholder="Create a password" required minlength="6">
+                            </div>
+                            <div class="password-strength" id="passwordStrength"></div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                                Password must be at least 6 characters.
+                            </div>
+                            <small class="text-muted">Use at least 6 characters with a mix of letters and numbers</small>
+                        </div>
+
+                        <!-- Account Type -->
+                        <div class="col-12">
+                            <label for="role" class="form-label">Account Type</label>
+                            <select class="form-select account-type-select" id="role" th:field="*{role}" required>
+                                <option value="">Select account type</option>
+                                <option th:each="roleOption : ${roles}"
+                                        th:value="${roleOption}"
+                                        th:text="${roleOption == T(com.houserental.entity.User.Role).TENANT ? 'Tenant (Looking for rental)' : 'Landlord (Property owner)'}">
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select an account type.
+                            </div>
+                        </div>
+
+                        <!-- Terms Checkbox -->
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" class="terms-link">Terms of Service</a> and
+                                    <a href="#" class="terms-link">Privacy Policy</a>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree to the terms and conditions.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary btn-register w-100 py-3 pulse-animation">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+
+                        <!-- Login Link -->
+                        <div class="col-12 text-center mt-3">
+                            <p class="mb-0">Already have an account?
+                                <a th:href="@{/login}" class="login-link">Sign in here</a>
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="scripts">
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrength');
+            let strength = 0;
+
+            // Length check
+            if (password.length > 5) strength++;
+            if (password.length > 7) strength++;
+
+            // Contains numbers
+            if (password.match(/\d/)) strength++;
+
+            // Contains special characters
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            // Contains both uppercase and lowercase
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+
+            // Update strength bar
+            strengthBar.className = 'password-strength strength-' + Math.min(strength, 4);
+
+            // Visual feedback
+            if (password.length < 6) {
+                this.classList.remove('is-valid');
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        // Animate the register button on hover
+        const registerBtn = document.querySelector('.btn-register');
+        registerBtn.addEventListener('mouseenter', function() {
+            this.classList.add('pulse-animation');
+        });
+
+        registerBtn.addEventListener('mouseleave', function() {
+            this.classList.remove('pulse-animation');
+        });
+
+        // Add ripple effect to buttons
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const x = e.clientX - e.target.getBoundingClientRect().left;
+                const y = e.clientY - e.target.getBoundingClientRect().top;
+
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

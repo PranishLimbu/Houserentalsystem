@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" layout:decorate="~{layout}">
+<head>
+    <title>Dashboard - RentEase</title>
+    <style>
+        /* Dashboard Specific Styles */
+        .dashboard-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            height: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #0d6efd;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action-btn {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation for welcome message */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-animation {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .dashboard-card .row {
+                flex-direction: column-reverse;
+            }
+
+            .dashboard-card .col-md-4 {
+                text-align: left !important;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container py-4">
+        <!-- Welcome Section -->
+        <div class="dashboard-card welcome-animation">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">Welcome back, <span th:text="${user?.firstName}" class="text-primary">User</span>!</h1>
+                    <p class="mb-0 opacity-75">
+                        <span th:if="${user?.role?.name() == 'TENANT'}">Find your perfect rental home with ease.</span>
+                        <span th:if="${user?.role?.name() == 'LANDLORD'}">Manage your properties and bookings efficiently.</span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex flex-column align-items-md-end">
+                            <span class="badge bg-light text-dark px-3 py-2 mb-2">
+                                <i class="fas fa-user me-1"></i>
+                                <span th:text="${user?.role?.name() == 'TENANT' ? 'Tenant' : 'Landlord'}">Role</span>
+                            </span>
+                        <small class="opacity-75">Member since <span th:text="${#temporals.format(user?.createdAt, 'MMM yyyy')}">Jan 2024</span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-5">
+            <!-- Tenant Statistics -->
+            <div th:if="${user?.role?.name() == 'TENANT'}" class="col-md-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${bookingCount ?: 0}">0</div>
+                    <div class="stat-label">Total Bookings</div>
+                    <div class="mt-2">
+                        <a th:href="@{/my-bookings}" class="btn btn-sm btn-outline-primary">View Bookings</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Landlord Statistics -->
+            <div th:if="${user?.role?.name() == 'LANDLORD'}" class="col-md-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${houseCount ?: 0}">0</div>
+                    <div class="stat-label">My Properties</div>
+                    <div class="mt-2">
+                        <a th:href="@{/my-houses}" class="btn btn-sm btn-outline-primary">Manage Properties</a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${user?.role?.name() == 'LANDLORD'}" class="col-md-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${pendingBookings ?: 0}">0</div>
+                    <div class="stat-label">Pending Bookings</div>
+                    <div class="mt-2">
+                        <a th:href="@{/my-bookings}" class="btn btn-sm btn-outline-warning">Review Requests</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Common Statistics -->
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-number">4.8</div>
+                    <div class="stat-label">Average Rating</div>
+                    <div class="mt-2">
+                        <small class="text-muted">Based on reviews</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support Available</div>
+                    <div class="mt-2">
+                        <a href="#" class="btn btn-sm btn-outline-success">Contact Support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0"><i class="fas fa-bolt me-2 text-warning"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Tenant Actions -->
+                            <div th:if="${user?.role?.name() == 'TENANT'}" class="col-md-6">
+                                <a th:href="@{/search}" class="btn btn-outline-primary w-100 py-3 quick-action-btn">
+                                    <i class="fas fa-search fa-2x d-block mb-2"></i>
+                                    <strong>Search Properties</strong>
+                                    <small class="d-block text-muted">Find your perfect home</small>
+                                </a>
+                            </div>
+                            <div th:if="${user?.role?.name() == 'TENANT'}" class="col-md-6">
+                                <a th:href="@{/my-bookings}" class="btn btn-outline-success w-100 py-3 quick-action-btn">
+                                    <i class="fas fa-calendar-check fa-2x d-block mb-2"></i>
+                                    <strong>My Bookings</strong>
+                                    <small class="d-block text-muted">Track your reservations</small>
+                                </a>
+                            </div>
+
+                            <!-- Landlord Actions -->
+                            <div th:if="${user?.role?.name() == 'LANDLORD'}" class="col-md-6">
+                                <a th:href="@{/my-houses/add}" class="btn btn-outline-primary w-100 py-3 quick-action-btn">
+                                    <i class="fas fa-plus fa-2x d-block mb-2"></i>
+                                    <strong>Add Property</strong>
+                                    <small class="d-block text-muted">List a new rental</small>
+                                </a>
+                            </div>
+                            <div th:if="${user?.role?.name() == 'LANDLORD'}" class="col-md-6">
+                                <a th:href="@{/my-houses}" class="btn btn-outline-success w-100 py-3 quick-action-btn">
+                                    <i class="fas fa-building fa-2x d-block mb-2"></i>
+                                    <strong>Manage Properties</strong>
+                                    <small class="d-block text-muted">Edit your listings</small>
+                                </a>
+                            </div>
+
+                            <!-- Common Actions -->
+                            <div class="col-md-6">
+                                <a th:href="@{/houses}" class="btn btn-outline-info w-100 py-3 quick-action-btn">
+                                    <i class="fas fa-home fa-2x d-block mb-2"></i>
+                                    <strong>Browse All</strong>
+                                    <small class="d-block text-muted">View all properties</small>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="#" class="btn btn-outline-secondary w-100 py-3 quick-action-btn">
+                                    <i class="fas fa-user-cog fa-2x d-block mb-2"></i>
+                                    <strong>Profile Settings</strong>
+                                    <small class="d-block text-muted">Update your info</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0"><i class="fas fa-bell me-2 text-info"></i>Recent Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-item mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Welcome to RentEase!</h6>
+                                    <p class="text-muted small mb-0">Your account has been created successfully.</p>
+                                    <small class="text-muted">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item mb-3" th:if="${user?.role?.name() == 'TENANT'}">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Start Your Search</h6>
+                                    <p class="text-muted small mb-0">Browse thousands of verified properties.</p>
+                                    <small class="text-muted">Tip</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item" th:if="${user?.role?.name() == 'LANDLORD'}">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Add Your First Property</h6>
+                                    <p class="text-muted small mb-0">Start earning by listing your property.</p>
+                                    <small class="text-muted">Tip</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="scripts">
+    <script>
+        // Dashboard specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stat cards on scroll
+            const statCards = document.querySelectorAll('.stat-card');
+
+            const animateOnScroll = () => {
+                statCards.forEach((card, index) => {
+                    const cardPosition = card.getBoundingClientRect().top;
+                    const screenPosition = window.innerHeight / 1.2;
+
+                    if(cardPosition < screenPosition) {
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            };
+
+            // Set initial state
+            statCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.5s ease-out';
+            });
+
+            // Run on load and scroll
+            animateOnScroll();
+            window.addEventListener('scroll', animateOnScroll);
+
+            // Add click animation to quick action buttons
+            const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+            quickActionBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Only animate if it's not a dropdown toggle
+                    if(!this.classList.contains('dropdown-toggle')) {
+                        this.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 200);
+                    }
+                });
+            });
+
+            // Update the current time in the welcome message
+            function updateWelcomeTime() {
+                const timeElements = document.querySelectorAll('.current-time');
+                if(timeElements.length > 0) {
+                    const now = new Date();
+                    const hours = now.getHours();
+                    let timeOfDay = 'day';
+
+                    if(hours < 12) timeOfDay = 'morning';
+                    else if(hours >= 12 && hours < 17) timeOfDay = 'afternoon';
+                    else timeOfDay = 'evening';
+
+                    timeElements.forEach(el => {
+                        el.textContent = timeOfDay;
+                    });
+                }
+            }
+
+            updateWelcomeTime();
+        });
+    </script>
+</div>
+</body>
+</html>
